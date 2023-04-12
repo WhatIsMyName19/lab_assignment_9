@@ -14,6 +14,7 @@ struct HashType
 {
 	struct RecordType* record;
 	struct HashType* next;
+	int flag;
 };
 
 // Compute the hash function
@@ -86,20 +87,32 @@ void displayRecordsInHash(struct HashType *pHashArray, int hashSz)
 	for (i=0;i<hashSz;++i)
 	{
 		// if index is occupied with any records, print all
+		struct HashType* temp = &pHashArray[i];
+
+		while (temp != NULL && temp->flag == 1)
+		{
+			printf("index %d -> %d, %c, %d\n", i, temp->record->id, temp->record->name, temp->record->order);
+			
+			temp = temp->next;
+		}
 	}
 }
 
-void deallocateHash(struct HashType* arr, int length)
+void deallocateHash(struct HashType* arr, int hashLength, int recordSz)
 {
-	for (int i = 0; i < length; i++)
+	for (int i = 0; i < hashLength; i++)
 	{
 		struct HashType* temp1 = &arr[i];
-		while (temp1 != NULL)
+		while (temp1 != NULL && temp1->flag == 1)
 		{
 			struct HashType* temp2 = temp1->next;
 			free(temp1);
 			temp1 = temp2;
+			recordSz--;
 		}
+
+		if (recordSz == 0)
+			break;
 	}
 }
 
@@ -111,18 +124,28 @@ int main(void)
 	recordSz = parseData("input.txt", &pRecords);
 	printRecords(pRecords, recordSz);
 	// Your hash implementation
-	int hashLength = hash(pRecords[recordSz - 1].id);
+	int hashLength = 500;
 	struct HashType* hashedArr = malloc(hashLength * sizeof(struct HashType));
-	
+
 	for (int i = 0; i < recordSz; i++)
 	{
 		int hashedNum = hash(pRecords[i].id);
 		
 		struct HashType* temp = &hashedArr[hashedNum];
-		
-		temp->record = &pRecords[i];
 
+		while (temp->flag == 1)
+			temp = temp->next;
+
+		temp->record = &pRecords[i];
+		temp->flag = 1;
+
+		temp->next = NULL;
+		temp++;
 	}
+
+	displayRecordsInHash(hashedArr, hashLength);
+
 	free(pRecords);
-	deallocateHash(hashedArr, hashLength);
+	deallocateHash(hashedArr, hashLength, recordSz);
+	return 0;
 }
