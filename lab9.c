@@ -146,6 +146,6 @@ int main(void)
 	displayRecordsInHash(hashedArr, hashLength);
 
 	free(pRecords);
-	deallocateHash(hashedArr, hashLength, recordSz);
+	free(hashedArr);
 	return 0;
 }
