@@ -98,24 +98,6 @@ void displayRecordsInHash(struct HashType *pHashArray, int hashSz)
 	}
 }
 
-void deallocateHash(struct HashType* arr, int hashLength, int recordSz)
-{
-	for (int i = 0; i < hashLength; i++)
-	{
-		struct HashType* temp1 = &arr[i];
-		while (temp1 != NULL && temp1->flag == 1)
-		{
-			struct HashType* temp2 = temp1->next;
-			free(temp1);
-			temp1 = temp2;
-			recordSz--;
-		}
-
-		if (recordSz == 0)
-			break;
-	}
-}
-
 int main(void)
 {
 	struct RecordType *pRecords;
